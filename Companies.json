@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "company": "Hotel California",
+    "city": "Santa Barbara",
+    "timezone": "US/Pacific"
+  },
+  {
+    "id": 2,
+    "company": "The Grand Budapest Hotel",
+    "city": "Republic of Zubrowka",
+    "timezone": "US/Central"
+  },
+  {
+    "id": 3,
+    "company": "The Heartbreak Hotel",
+    "city": "Graceland",
+    "timezone": "US/Central"
+  },
+  {
+    "id": 4,
+    "company": "The Prancing Pony",
+    "city": "Bree",
+    "timezone": "US/Central"
+  },
+  {
+    "id": 5,
+    "company": "The Fawlty Towers",
+    "city": "Torquay",
+    "timezone": "US/Eastern"
+  },
+  {
+  	"id": 6,
+  	"company": "The Black Pearl",
+  	"city": "Gulf of Mexico",
+  	"timezone": "US/Central"
+  },
+  {
+  	"id": 7,
+  	"company": "International Space Station",
+  	"city": "Upper Atmosphere",
+  	"timezone": "UTC"
+  }
+]

@@ -1,0 +1,24 @@
+import java.util.*;
+import org.json;
+
+public class MessageTemplate {
+    private String[] greeting = {"Good ", " ", " ", " and welcome to ", " ! Room ",
+    " is now ready for you. Enjoy your stay and let us know if you need anything or have any questions about "};
+    private static ArrayList<List<String>> jsonFields = new ArrayList<List<String>>();
+   
+    public static void main(String[] args){
+        jsonFields.add(Arrays.asList("Guests", "reservation", "startTimeStamp"));
+        jsonFields.add(Arrays.asList("Guests", "firstName"));
+        jsonFields.add(Arrays.asList("Guests", "lastName"));
+        jsonFields.add(Arrays.asList("Companies", "company"));
+        jsonFields.add(Arrays.asList("Guests", "reservation", "roomNumber"));
+        jsonFields.add(Arrays.asList("Companies", "city"));
+
+        for (int i = 0; i < jsonFields.size(); i++) {
+            for (int j = 0; j < jsonFields.get(i).size(); j++) {
+                System.out.println(jsonFields.get(i).get(j));
+            }
+        }
+    }
+
+}

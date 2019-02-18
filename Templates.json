@@ -1,0 +1,66 @@
+[
+	{
+		"id": 1,
+		"type": "Generic Greeting",
+		"text": ["Good ", " ", " ", " and welcome to ", "! Room ", 
+			" is now ready for you. Enjoy your stay and let us know if you need anything or have any questions about ",
+			"."],
+		"fields":
+			[{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "startTimestamp"}, 
+			{"file": "Guests",
+			"key": "firstName"}, 
+			{"file": "Guests",
+			"key": "lastName"},
+			{"file": "Companies",
+			"key": "company"},
+			{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "roomNumber"},
+			{"file": "Companies",
+			"key": "city"}]
+	},
+	{
+		"id": 2,
+		"type": "Nautical Greeting",
+		"text": ["Good ", " shipmate ", " ", " and welcome aboard ", "! Cabin ", 
+			" is now ready for you. Enjoy your voyage amidst ", " and let us know if desire anything upon these high seas."],
+		"fields":
+			[{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "startTimestamp"}, 
+			{"file": "Guests",
+			"key": "firstName"}, 
+			{"file": "Guests",
+			"key": "lastName"},
+			{"file": "Companies",
+			"key": "company"},
+			{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "roomNumber"},
+			{"file": "Companies",
+			"key": "city"}]		
+	},
+	{
+		"id": 3,
+		"type": "Space Greeting",
+		"text": ["Good ", " ", " ", " and welcome to the ", "! Bunk ", 
+			" is now ready for you. Enjoy your extraterrestial outing in ", " and let us know if you need spacewalking tips or are ready to return to earth."],
+		"fields":
+			[{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "startTimestamp"}, 
+			{"file": "Guests",
+			"key": "firstName"}, 
+			{"file": "Guests",
+			"key": "lastName"},
+			{"file": "Companies",
+			"key": "company"},
+			{"file": "Guests",
+			"key": "reservation",
+			"innerKey": "roomNumber"},
+			{"file": "Companies",
+			"key": "city"}]
+	}
+]
