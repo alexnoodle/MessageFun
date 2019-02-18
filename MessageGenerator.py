@@ -4,7 +4,7 @@ import pytz
 
 '''
 Takes in the file of the template json and allows for user uploading of new
-templates from the terminal
+templates from the terminal.
 '''
 class MessageTemplate:
     templates = []
@@ -25,29 +25,137 @@ class MessageTemplate:
     def getAllTemplates(self):
         return self.templates
 
-    def getLargestId(self):
-        return self.templates[len(self.templates) - 1]['id']
-
     def addTemplateFromFile(self, template): 
         templateFile = open(template, 'r')
         self.templates.append(json.loads(templateFile.read()))
 
     def addUserTemplate(self, template):
-        userFile = open("UserTemplates.json", 'r')
-        if userFile.read() == None:
-            userFile.close()
-            userFile = open("UserTemplates.json", 'w')
-            userFile.write(json.dumps(template))
-        else:
-            previousAdditions = json.loads(userFile.read())
-            previousAdditions += template
-            userFile.close()
-            userFile = open("UserTemplates.json", 'w')
-            userFile.write(json.dumps(previousAdditions))
-        userFile.close()
-        self.templates.append(template)
+        self.templates.append(template)  
 
-    def userGeneratedTemplate(self, companyRead, guestRead):
+
+'''
+Takes in the file of the guest json
+'''
+class GuestInfo:
+    guests = []
+    guestKeywords = ["firstName", "lastName", "reservation: roomNumber", 
+    "reservation: startTimestamp", "reservation: endTimestamp"]
+
+    def __init__(self, guest):
+        guestFile = open(guest, 'r')
+        for guest in json.loads(guestFile.read()):
+            self.guests.append(guest)
+        guestFile.close()
+
+    def getGuest(self, id):
+        for person in self.guests:
+            if int(person['id']) == id:
+                return person
+
+    def getAllGuests(self):
+        return self.guests
+
+    def getKeywords(self):
+        return self.guestKeywords
+
+'''
+Takes in the file of the company json
+'''
+class CompanyInfo:
+    companies = []
+    companyKeywords = ["company", "city", "timezone"]
+
+    def __init__(self, company):
+        companyFile = open(company, 'r')
+        for company in json.loads(companyFile.read()):
+            self.companies.append(company)
+        companyFile.close()
+
+    def getCompany(self, id):
+        for corporation in self.companies:
+            if int(corporation['id']) == id:
+                return corporation
+
+    def getAllCompanies(self):
+        return self.companies
+
+    def getKeywords(self):
+        return self.companyKeywords
+
+'''
+The way this somewhat cumbersome system works is that the guest and company
+fields are each dictionaries of the respective guest and company and the
+loop goes through the greeting template and alternates between adding the next
+piece of the greeting and the next corresponding field. The template variable
+has the array of strings that makes up the greeting and the templateFields
+variable holds the arrays that contain the keys to the guest or company dicts.
+Not super clean but it works.
+'''
+def createGreeting(guest, company, greeting, fields):
+    finalGreeting = ""
+    maxLength = max(len(greeting),len(fields))
+    
+    for i in range(maxLength): 
+        
+        #adding the text
+        if i < len(greeting):
+            finalGreeting += str(greeting[i])
+        
+        #adding the variables
+        if i < len(fields):
+            if fields[i]['file'] == "Guests":
+                response = guest[fields[i]['key']]
+                
+                #Adding the morning/afternoon test
+                if len(fields[i]) == 3 and fields[i]['innerKey'] == 'startTimestamp':
+                    timestamp = float(response[fields[i]['innerKey']])
+                    timezone = pytz.timezone(company['timezone'])
+                    actualTime = datetime.fromtimestamp(timestamp, timezone)
+                    if actualTime.hour <= 12:
+                        response = "morning"
+                    else:
+                        response = "afternoon"
+
+                #the other options would be room numbers
+                elif len(fields[i]) == 3:
+                    response = response[fields[i]['innerKey']]
+                
+                #If the field isn't in the reservation section
+                finalGreeting += str(response)
+
+            elif fields[i]['file'] == "Companies":
+                finalGreeting += company[fields[i]['key']]
+
+    return finalGreeting
+
+'''
+This is for the user generated template section. Every time a change is made to
+the template this method is used to print the text and the keywords in quotes
+'''
+def incompleteGreeting(greetingText, greetingFields):
+        finalGreeting = ""
+        maxLength = max(len(greetingText),len(greetingFields))
+        for i in range(maxLength): 
+            #adding the text
+            if i < len(greetingText):
+                finalGreeting += str(greetingText[i])
+            
+            #adding the variables
+            if i < len(greetingFields):
+                if len(greetingFields[i]) == 3:
+                    finalGreeting += "'" + str(greetingFields[i]['key']) + " " + str(greetingFields[i]['innerKey']) + "'"
+                else:
+                    finalGreeting += "'" + str(greetingFields[i]['key']) + "'"
+        print("What your template looks like so far: ")
+        print(finalGreeting)
+        
+'''
+This allows the user to write their own template should they wish. It prompts
+user to insert text, then keyword, then text, and so on until they decide it's
+finished. The template is saved during the session but it isn't added to the
+json file. Another place for expansion.
+'''
+def userGeneratedTemplate(message, companyRead, guestRead):
         newGreetingId = len(self.templates) + 1
         newGreetingText = []
         newGreetingFields = []
@@ -153,122 +261,9 @@ class MessageTemplate:
 
         newTemplate = {"id": newGreetingId, "type": templateType, "text": newGreetingText,
                         "fields": newGreetingFields}
-        self.addUserTemplate(newTemplate)
+        message.addUserTemplate(newTemplate)
         print(str(newTemplate))
-        return newGreetingId
-
-    def incompleteGreeting(greetingText, greetingFields):
-        finalGreeting = ""
-        maxLength = max(len(greetingText),len(greetingFields))
-        for i in range(maxLength): 
-            #adding the text
-            if i < len(greetingText):
-                finalGreeting += str(greetingText[i])
-            
-            #adding the variables
-            if i < len(greetingFields):
-                if len(greetingFields[i]) == 3:
-                    finalGreeting += str(greetingFields[i]['key']) + " " + str(greetingFields[i]['innerKey'])
-                else:
-                    finalGreeting += str(greetingFields[i]['key'])
-        print("What your template looks like so far: ")
-        print(finalGreeting)    
-
-
-'''
-Takes in the file of the guest json
-'''
-class GuestInfo:
-    guests = []
-    guestKeywords = ["firstName", "lastName", "reservation: roomNumber", 
-    "reservation: startTimestamp", "reservation: endTimestamp"]
-
-    def __init__(self, guest):
-        guestFile = open(guest, 'r')
-        for guest in json.loads(guestFile.read()):
-            self.guests.append(guest)
-        guestFile.close()
-
-    def getGuest(self, id):
-        for person in self.guests:
-            if int(person['id']) == id:
-                return person
-
-    def getAllGuests(self):
-        return self.guests
-
-    def getKeywords(self):
-        return self.guestKeywords
-
-'''
-Takes in the file of the company json
-'''
-class CompanyInfo:
-    companies = []
-    companyKeywords = ["company", "city", "timezone"]
-
-    def __init__(self, company):
-        companyFile = open(company, 'r')
-        for company in json.loads(companyFile.read()):
-            self.companies.append(company)
-        companyFile.close()
-
-    def getCompany(self, id):
-        for corporation in self.companies:
-            if int(corporation['id']) == id:
-                return corporation
-
-    def getAllCompanies(self):
-        return self.companies
-
-    def getKeywords(self):
-        return self.companyKeywords
-
-'''
-The way this somewhat cumbersome system works is that the guest and company
-fields are each dictionaries of the respective guest and company and the
-loop goes through the greeting template and alternates between adding the next
-piece of the greeting and the next corresponding field. The template variable
-has the array of strings that makes up the greeting and the templateFields
-variable holds the arrays that contain the keys to the guest or company dicts.
-Not super clean but it works.
-'''
-def createGreeting(guest, company, greeting, fields):
-    finalGreeting = ""
-    maxLength = max(len(greeting),len(fields))
-    
-    for i in range(maxLength): 
-        
-        #adding the text
-        if i < len(greeting):
-            finalGreeting += str(greeting[i])
-        
-        #adding the variables
-        if i < len(fields):
-            if fields[i]['file'] == "Guests":
-                response = guest[fields[i]['key']]
-                
-                #Adding the morning/afternoon test
-                if len(fields[i]) == 3 and fields[i]['innerKey'] == 'startTimestamp':
-                    timestamp = float(response[fields[i]['innerKey']])
-                    timezone = pytz.timezone(company['timezone'])
-                    actualTime = datetime.fromtimestamp(timestamp, timezone)
-                    if actualTime.hour <= 12:
-                        response = "morning"
-                    else:
-                        response = "afternoon"
-
-                #the other options would be room numbers
-                elif len(fields[i]) == 3:
-                    response = response[fields[i]['innerKey']]
-                
-                #If the field isn't in the reservation section
-                finalGreeting += str(response)
-
-            elif fields[i]['file'] == "Companies":
-                finalGreeting += company[fields[i]['key']]
-
-    return finalGreeting
+        return newGreetingId  
 
 '''
 This method provides the basic terminal user interface 
@@ -287,7 +282,7 @@ def terminalSession(message, guestRead, companyRead):
     templateNumber = input("Choose an id number or type 'create' "
                         " to create your own template: ")
     if templateNumber == "create":
-        templateNumber = str(message.userGeneratedTemplate(companyRead, guestRead))
+        templateNumber = str(userGeneratedTemplate(message, companyRead, guestRead))
     while templateNumber.isdigit() == False:
         templateNumber = input("Choose a real number: ")
     while int(templateNumber) < 1 or int(templateNumber) > len(message.getAllTemplates()):
